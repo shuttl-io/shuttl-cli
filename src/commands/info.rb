@@ -32,6 +32,19 @@ class Info < CommandBase
                 $stderr.puts "No container running for this dir!".red
             end
         end
+        if options[:status]
+            if isRunning?
+                if @container.json["State"]['Running']
+                    $stdout.puts "Shuttl is up and running!".green
+                else
+                    @container.json["State"].each do |name, value|
+                        puts "#{name}: #{value}" 
+                    end
+                end
+            else
+                $stderr.puts "No container running for this dir!".red
+            end
+        end
     end
 
 end

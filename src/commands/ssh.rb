@@ -22,7 +22,8 @@ class SSH < CommandBase
             $stderr.puts "Error: #{e}".red
         end
         ios.close
-        ` reset`
+        ## The space is put before the command so that it won't show up in bash history
+        ` stty sane`
     end
 
 end
