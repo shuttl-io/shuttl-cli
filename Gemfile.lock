@@ -1,0 +1,21 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    colorize (0.8.1)
+    docker-api (1.34.0)
+      excon (>= 0.47.0)
+      multi_json
+    excon (0.60.0)
+    multi_json (1.13.1)
+    ncurses-ruby (1.2.4)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  colorize
+  docker-api
+  ncurses-ruby
+
+BUNDLED WITH
+   1.15.1

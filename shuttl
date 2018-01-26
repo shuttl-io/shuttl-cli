@@ -1,0 +1,94 @@
+#!/usr/bin/ruby
+
+require 'optparse'
+require_relative 'src/dsl/eval'
+require_relative 'src/commands/start'
+require_relative 'src/commands/stop'
+require_relative 'src/commands/build'
+require_relative 'src/commands/info'
+require_relative 'src/commands/run'
+require_relative 'src/commands/ssh'
+
+Docker.validate_version!
+
+options = {
+    :fileName => './Shuttlfile'
+}
+
+globals = OptionParser.new do |opts|
+    opts.banner = "Usage: shuttl [command]"
+end
+
+subcommands = Hash[
+    "start" => {
+        :opts => OptionParser.new do |opts| 
+            opts.banner = "Starts a new instance of the app"
+            opts.on('--file FILE', 'Defines the file to use as the build file') do |file|
+                options[:fileName] = file
+            end
+            options[:stage] = 'dev'
+        end,
+        :runner => Start.new
+    },
+    'build' => { 
+        :opts => OptionParser.new do |opts|
+            options[:stage] = 'dev'
+            opts.on('--file FILE', 'Defines the file to use as the build file') do |file|
+                options[:fileName] = file
+            end       
+            opts.on('-s STAGE', '--stage STAGE', 'The build stage') do |stage|
+                options[:stage] = stage
+            end
+        end,
+        :runner => Build.new
+    },
+    'show' => {
+        :opts => OptionParser.new do |opts|
+            options[:stage] = 'dev'
+            options[:showIP] = false
+            options[:showDocker] = false
+            options[:container] = false
+            opts.on('--docker-file', 'Show the docker file') do |file|
+                options[:showDocker] = true
+            end  
+            opts.on('--file FILE', 'Defines the file to use as the build file') do |file|
+                options[:fileName] = file
+            end       
+            opts.on('-s STAGE', '--stage STAGE', 'The build stage') do |stage|
+                options[:stage] = stage
+            end
+            opts.on('--ip', 'Shows the IP address of the running container') do
+                options[:showIP] = true
+            end
+            opts.on('--container', 'Shows the container\'s json information') do
+                options[:container] = true
+            end
+        end,
+        :runner => Info.new
+    },
+    'stop' => {
+        :opts => OptionParser.new do |opts|
+            options[:stage] = 'dev'
+        end,
+        :runner => Stop.new
+    },
+    'run' => {
+        :opts => OptionParser.new do |opts|
+        end,
+        :runner => Run.new
+    },
+    'ssh' => {
+        :opts => OptionParser.new do |opts|
+        end,
+        :runner => SSH.new
+    }
+]
+
+global = OptionParser.new do |opts|
+    # ...
+end
+
+global.order!
+command = ARGV.shift
+subcommands[command][:opts].order!
+subcommands[command][:runner].handle options, ARGV
