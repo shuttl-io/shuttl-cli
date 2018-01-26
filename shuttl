@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 require 'optparse'
+require 'colorize'
 require_relative 'src/dsl/eval'
 require_relative 'src/commands/start'
 require_relative 'src/commands/stop'
@@ -10,6 +11,8 @@ require_relative 'src/commands/run'
 require_relative 'src/commands/ssh'
 
 Docker.validate_version!
+
+VERSION = '0.0.1'
 
 options = {
     :fileName => './Shuttlfile'
@@ -48,6 +51,7 @@ subcommands = Hash[
             options[:showIP] = false
             options[:showDocker] = false
             options[:container] = false
+            options[:status] = false
             opts.on('--docker-file', 'Show the docker file') do |file|
                 options[:showDocker] = true
             end  
@@ -62,6 +66,9 @@ subcommands = Hash[
             end
             opts.on('--container', 'Shows the container\'s json information') do
                 options[:container] = true
+            end
+            opts.on('--status', 'Shows the container\'s status') do
+                options[:status] = true
             end
         end,
         :runner => Info.new
@@ -85,10 +92,17 @@ subcommands = Hash[
 ]
 
 global = OptionParser.new do |opts|
+    opts.banner = "Usage: shuttl [options] [subcommand [options]]"
+    opts.on('--version', 'get the version of the app') do
+        options[:skip_all] = true
+        puts "Shuttl Version: #{VERSION}".green
+    end
     # ...
 end
 
 global.order!
-command = ARGV.shift
-subcommands[command][:opts].order!
-subcommands[command][:runner].handle options, ARGV
+if !options[:skip_all]
+    command = ARGV.shift
+    subcommands[command][:opts].order!
+    subcommands[command][:runner].handle options, ARGV
+end
