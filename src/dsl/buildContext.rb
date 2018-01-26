@@ -1,10 +1,10 @@
 class Builder 
 
-    attr_accessor :stage
-    def initialize (fileLocation, name=nil)
+    attr_accessor :stage, :buildStage, :buildSettings, :volumes
+    def initialize (fileLocation, stage=nil, name=nil)
         @name = name
-        @stage = Hash[:complete => { :settings => {}, :docker => [], :files => {}, :volumes => {} }]
-        @current_stage = :complete
+        @buildStage = stage
+        @buildSettings = { :settings => {}, :docker => [], :files => {}, :volumes => {} }
         @entrypoint = nil
         @volumes = {}
         @cwd = Dir.getwd
@@ -64,11 +64,7 @@ class Builder
     end
 
     def gatherSettings (stage)
-        settings = @stage[:complete][:settings]
-        if !@stage[stage].nil?
-            settings = settings.merge @stage[stage][:settings]
-        end
-        settings
+        settings = @buildSettings[:settings]
     end
 
     def makeDockerFile (stage)
@@ -78,11 +74,7 @@ class Builder
             settingsArr << "ARG #{key}=#{value}"
             settingsArr << "ENV #{key}=${#{key}}"
         end
-        definition = @stage[:complete][:docker]
-        stageDef = @stage[stage]
-        if !stageDef.nil?
-            definition = definition.concat stageDef[:docker]
-        end
+        definition = @buildSettings[:docker]
         definition = [definition[0], ] + settingsArr + definition[1..definition.count]
         if @entrypoint
             definition << "ENTRYPOINT #{@entrypoint}"
@@ -96,11 +88,7 @@ class Builder
 
 
     def gatherFiles (stage, cwd)
-        files = @stage[:complete][:files]
-        stageDef = @stage[stage]
-        if !stageDef.nil?
-            files = files.merge stageDef[:files]
-        end
+        files = @buildSettings[:files]
         files
     end
 
@@ -117,66 +105,56 @@ class Builder
 
     def build (stage, cwd, block=nil )
         makeImage stage, cwd
-        query = @stage[:complete][:settings]
-        if !@stage[stage].nil?
-            query = query.merge @stage[stage][:settings] 
-        end
+        query = @buildSettings[:settings]
         Docker::Image.build_from_tar @output.tap(&:rewind), :query => query do |v|
             yield v
         end
     end
 
     def add (command)
-        @stage[@current_stage][:docker] << command
+        @buildSettings[:docker] << command
     end
 
     def fileAdd (source, destination)
-        @stage[@current_stage][:files][source] = destination
+        @buildSettings[:files][source] = destination
         add "ADD #{destination} #{destination}"
     end 
 
     def set (setting, value)
-        @stage[@current_stage][:settings][setting] = value
+        @buildSettings[:settings][setting] = value
     end
 
     def on (name)
-        if !@stage.key?(name)
-            @stage[name] = Hash[:settings => {}, :docker => [], :files => {}, :volumes => {}]
+        if name != @buildStage
+            return
         end
-        @current_stage = name
         yield
-        @current_stage = :complete
     end
     
     def merge (other)
-        newInfo = @stage.merge(other.stage) do |key, old, newVal|      
-            newVal.merge old do |key, old, newVal|
-                if key == :settings
-                    old.merge newVal
-                elsif key == :files
-                    old.merge newVal
-                elsif key == :docker
-                    old.concat newVal
-                end
+        newInfo = @buildSettings.merge(other.buildSettings) do |key, old, newVal|
+            if key == :settings
+                old.merge newVal
+            elsif key == :files
+                old.merge newVal
+            elsif key == :docker
+                old.concat newVal
             end
         end
-        @stage = newInfo
-        # @stage = @stage.merge(other.stage)
+        @buildSettings = newInfo
+        @volumes = other.volumes.merge @volumes
+        
     end
 
     def attach(localDir, volume)
         if localDir == 'pwd'
             localDir = @cwd
         end
-        @stage[@current_stage][:volumes][volume] = localDir
+        @volumes[volume] = localDir
     end
 
     def gatherVolume(stage)
-        volumes = @stage[:complete][:volumes] || Hash[]
-        if !@stage[stage].nil?
-            volumes = volumes.merge @stage[stage][:volumes]
-        end
-        volumes
+        @volumes
     end
 
 end

@@ -61,7 +61,7 @@ class Shuttl
     def EXTENDS (name)
         require_relative '../Shuttl/Loader'
         loader = Loader.new
-        @builder.merge loader.find name
+        @builder.merge loader.find name, @builder.buildStage
     end
 
     def SET (setting, value)

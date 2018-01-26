@@ -8,7 +8,7 @@ class Build < CommandBase
     def build (options)
         $stdout.print "Building new image\n"        
         file = File.expand_path(options[:fileName], Dir.getwd)
-        shuttlConfig = ShuttlDSL.load file
+        shuttlConfig = ShuttlDSL.load file, options[:stage]
         # tar = shuttlConfig.makeImage options[:stage], @cwd
         begin
             step = 1

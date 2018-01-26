@@ -1,7 +1,7 @@
 
 class Loader
     # require '../dsl/eval'    
-    def initialize
+    def initialize ()
         @dirs = []
         shuttlDir = File.join(Dir.home, '.shuttl/definitions')
         @dirs << shuttlDir
@@ -11,10 +11,10 @@ class Loader
         @dirs << Dir.getwd
     end
 
-    def find (name)
+    def find (name, stage)
         found = nil
         [name, "#{name}.shuttlfile"].each do |fileName|
-            found = findFile(fileName)
+            found = findFile(fileName, stage)
             if !found.nil?
                 break
             end
@@ -25,12 +25,12 @@ class Loader
         found
     end
 
-    def findFile (file)
+    def findFile (file, stage)
         found = nil
         @dirs.each do | dir |
             potentialFileName = File.join(dir, file)
             if File.exist? potentialFileName
-                found = ShuttlDSL.load potentialFileName
+                found = ShuttlDSL.load potentialFileName, stage
                 break
             end
         end
