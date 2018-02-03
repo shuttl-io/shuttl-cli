@@ -9,7 +9,7 @@ class Builder
         @volumes = {}
         @cwd = Dir.getwd
         @fileLocation = fileLocation
-        @output = StringIO.new
+        @output = Tempfile.new('shuttlBuild')
         @tar = Gem::Package::TarWriter.new(@output)
         @dirs = [fileLocation, Dir.getwd, File.join(Dir.home, '.shuttl/definitions')]
         if ENV.key('SHUTTL_PATH')
@@ -22,7 +22,10 @@ class Builder
         @dirs.each do | dir |
             potentialFileName = File.join(dir, name)
             if File.exist? potentialFileName
-                found = File.read(potentialFileName)
+                if File.directory? potentialFileName
+                    raise Errno::EISDIR
+                end
+                found = File.open(potentialFileName)
                 break
             end
         end
@@ -40,13 +43,28 @@ class Builder
         @name
     end
 
-    def addFile(localName, nameInDocker)
-        file = findFile(localName)
+    def addFile(localName, nameInDocker, rootName=nil)
+        if rootName.nil?
+            rootName = nameInDocker
+        end
+        begin
+            file = findFile(localName)
+        rescue Errno::EISDIR
+            @tar.mkdir(nameInDocker, 0640)
+            Dir["#{localName}/**/*"].each do |file|
+                pathInDocker = File.join(rootName, file)
+                addFile(file, pathInDocker, rootName)
+            end
+            return
+        end
+
         permissions = file.is_a?(Hash) ? file[:permissions] : 0640
         @tar.add_file(nameInDocker, permissions) do | tarFile | 
-            content = file.is_a?(Hash) ? file[:content] : file
-            tarFile.write(content)
+            while buffer = file.read(1024 * 1000)
+                tarFile.write(buffer)
+            end
         end
+        @tar.flush
     end
 
     def create_tar(hash = {}, tap=true)
@@ -82,7 +100,9 @@ class Builder
         volumes = gatherVolume stage
         definition << "RUN echo 'echo SHUTTL IMAGE BOOTED' >> /.shuttl/run"
         definition << "RUN echo 'bash /.shuttl/start' >> /.shuttl/run"
-        definition << "VOLUME #{volumes.keys}"
+        if volumes.keys.count > 0
+            definition << "VOLUME #{volumes.keys}"
+        end
         definition.join("\n") 
     end
 
@@ -104,10 +124,15 @@ class Builder
     end
 
     def build (stage, cwd, block=nil )
-        makeImage stage, cwd
-        query = @buildSettings[:settings]
-        Docker::Image.build_from_tar @output.tap(&:rewind), :query => query do |v|
-            yield v
+        begin
+            makeImage stage, cwd
+            query = @buildSettings[:settings]
+            Docker::Image.build_from_tar @output.tap(&:rewind), :query => query do |v|
+                yield v
+            end
+        ensure
+            @output.close
+            @output.unlink
         end
     end
 

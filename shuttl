@@ -9,6 +9,7 @@ require_relative 'src/commands/build'
 require_relative 'src/commands/info'
 require_relative 'src/commands/run'
 require_relative 'src/commands/ssh'
+require_relative 'src/commands/deploy'
 
 Docker.validate_version!
 
@@ -88,6 +89,15 @@ subcommands = Hash[
         :opts => OptionParser.new do |opts|
         end,
         :runner => SSH.new
+    },
+    'deploy' => {
+        :opts => OptionParser.new do |opts|
+            options[:stage] = 'production'
+            opts.on('-s STAGE', '--stage STAGE', 'The build stage') do |stage|
+                options[:stage] = stage
+            end
+        end,
+        :runner => Deploy.new
     }
 ]
 

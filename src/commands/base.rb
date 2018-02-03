@@ -35,7 +35,12 @@ class CommandBase
 
     def isRunning?
         if (@info['containers'].key?(@cwd))
-            @container = Docker::Container.get(@info['containers'][@cwd]["container_id"])
+            begin
+                @container = Docker::Container.get(@info['containers'][@cwd]["container_id"])
+            rescue Docker::Error::NotFoundError
+                @info['containers'].delete(@cwd)
+                return false
+            end
             return @container.json['State']['Running']
         end
         false
