@@ -2,18 +2,19 @@
 
 require 'optparse'
 require 'colorize'
-require_relative 'src/dsl/eval'
-require_relative 'src/commands/start'
-require_relative 'src/commands/stop'
-require_relative 'src/commands/build'
-require_relative 'src/commands/info'
-require_relative 'src/commands/run'
-require_relative 'src/commands/ssh'
-require_relative 'src/commands/deploy'
+require_relative '../src/dsl/eval'
+require_relative '../src/commands/start'
+require_relative '../src/commands/stop'
+require_relative '../src/commands/build'
+require_relative '../src/commands/info'
+require_relative '../src/commands/run'
+require_relative '../src/commands/ssh'
+require_relative '../src/commands/deploy'
+require_relative '../src/commands/install'
 
 Docker.validate_version!
 
-VERSION = '0.0.1'
+VERSION = '1.0.0'
 
 options = {
     :fileName => './Shuttlfile'
@@ -98,6 +99,15 @@ subcommands = Hash[
             end
         end,
         :runner => Deploy.new
+    },
+    'install' => {
+        :opts => OptionParser.new do |opts|
+            options[:installPath] = "#{Dir.home}/.shuttl"
+            opts.on('-p PATH', '--install-path PATH', 'The path to install to') do |path| 
+                options[:installPath] = path
+            end
+        end,
+        :runner => Install.new
     }
 ]
 

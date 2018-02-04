@@ -8,6 +8,7 @@ GEM
     excon (0.60.0)
     multi_json (1.13.1)
     ncurses-ruby (1.2.4)
+    rubyzip (1.2.1)
 
 PLATFORMS
   ruby
@@ -16,6 +17,7 @@ DEPENDENCIES
   colorize
   docker-api
   ncurses-ruby
+  rubyzip (>= 1.0.0)
 
 BUNDLED WITH
    1.15.1
