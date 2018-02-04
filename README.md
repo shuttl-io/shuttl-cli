@@ -5,7 +5,7 @@ The command line tool for building Shuttl files!
 Shuttl enables you to build docker images with ease! The shuttl file is an abstraction on top of the docker file and allows you to use a single file to define multiple types of images
 
 ## Installation
-To install Shuttl, simply run `sudo gem install shuttl --no-user-install`. 
+To install Shuttl, simply run `sudo gem install shuttl --no-user-install`. Then run `shuttl install`
 
 ## Usage
 Using Shuttl is easy! It supports all Docker file commands, with minor differences
