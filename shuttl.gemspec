@@ -2,7 +2,7 @@ require 'rake';
 
 Gem::Specification.new do |s|
     s.name        = 'shuttl'
-    s.version     = '1.0.0'
+    s.version     = '1.1.0'
     s.date        = '2010-04-28'
     s.summary     = "Shuttl!"
     s.description = "Shuttl builds doccker images easily"

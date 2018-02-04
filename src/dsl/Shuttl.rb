@@ -64,6 +64,10 @@ class Shuttl
         @builder.merge loader.find name, @builder.buildStage
     end
 
+    def USE (name)
+        EXTENDS name
+    end
+
     def SET (setting, value)
         @builder.set setting, value
     end
@@ -81,5 +85,12 @@ class Shuttl
     def ATTACH (localDir, volume)
         @builder.attach(localDir, volume)
     end
-    
+
+    def ENVIRONMENT (tester)
+        tester.call(@builder.buildSettings[:settings]['ENVIRONMENT'])
+    end
+
+    def IS (name)
+        proc {|value| value == name }
+    end
 end
