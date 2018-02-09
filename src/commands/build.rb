@@ -13,7 +13,7 @@ class Build < CommandBase
         # tar = shuttlConfig.makeImage options[:stage], @cwd
         begin
             step = 1
-            @image = shuttlConfig.build options[:stage], @cwd do |v|
+            @image = shuttlConfig.build options[:stage], @cwd, options[:clean] do |v|
                 if (log = JSON.parse(v)) && log.has_key?("stream")
                     $stdout.puts log['stream']
                     if log['stream'].include? 'Step'

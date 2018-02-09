@@ -14,7 +14,7 @@ require_relative '../src/commands/install'
 
 Docker.validate_version!
 
-VERSION = '1.1.0'
+VERSION = '1.2.0'
 
 options = {
     :fileName => './Shuttlfile'
@@ -38,11 +38,15 @@ subcommands = Hash[
     'build' => { 
         :opts => OptionParser.new do |opts|
             options[:stage] = 'dev'
+            options[:clean] = false
             opts.on('--file FILE', 'Defines the file to use as the build file') do |file|
                 options[:fileName] = file
             end       
             opts.on('-s STAGE', '--stage STAGE', 'The build stage') do |stage|
                 options[:stage] = stage
+            end
+            opts.on('--clean', 'Preform a clean build (Don\'t use the cache)') do 
+                options[:clean] = true
             end
         end,
         :runner => Build.new

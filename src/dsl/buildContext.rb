@@ -123,11 +123,20 @@ class Builder
         end
     end
 
-    def build (stage, cwd, block=nil )
+    def build (stage, cwd, clean )
         begin
             makeImage stage, cwd
-            query = @buildSettings[:settings]
-            Docker::Image.build_from_tar @output.tap(&:rewind), :query => query do |v|
+            query = {}
+            query[:buildargs] = {}
+            @buildSettings[:settings].each do |key, value|
+                query[:buildargs][key] = value.to_s
+            end
+            query[:buildargs] = query[:buildargs].to_json
+            if clean
+                query[:nocache] = true
+            end
+            puts query
+            Docker::Image.build_from_tar @output.tap(&:rewind), query do |v|
                 yield v
             end
         ensure
