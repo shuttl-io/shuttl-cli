@@ -83,3 +83,7 @@ Runs a bash instance inside the container.
 
 ### `shuttl run <COMMAND>`
 Runs a command inside the container
+
+### Mailing list
+
+To recieve updates, discuss ideas, or just to talk join our mailing list at [https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new](https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new)
