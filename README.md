@@ -86,4 +86,4 @@ Runs a command inside the container
 
 ### Mailing list
 
-To recieve updates, discuss ideas, or just to talk join our mailing list at [https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new](https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new)
+To recieve updates, discuss ideas, or just to talk join our mailing list at [https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new](https://groups.google.com/a/shuttl.io/forum/?hl=en#!forum/shuttl-tools/new) or email us at [shuttl-tools@shuttl.io](mailto:shuttl-tools@shuttl.io)
