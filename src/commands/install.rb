@@ -9,6 +9,13 @@ require_relative 'base'
 
 class Install < CommandBase
 
+    def initialize
+        if !File.exists? File.join(Dir.home, '.shuttl/info')
+            Dir.mkdir(File.join(Dir.home, ".shuttl/info"), 0700)
+        end
+        super
+    end
+
     def run (options)
         tempFile = Tempfile.new('shuttl.zip')        
         Net::HTTP.start("s3.us-east-2.amazonaws.com") do |http|
