@@ -68,7 +68,7 @@ Usage: `ATTACH <local path> <container_point>`
 ### `shuttl build`
 Builds the image using the Shuttlfile
 
-####Args:
+#### Args:
 *--stage=STAGE:* The stage to build
 *--file=FILE:* The file to build
 
