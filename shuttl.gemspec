@@ -18,5 +18,5 @@ Gem::Specification.new do |s|
     s.require_paths = ["src"]
     s.add_runtime_dependency 'docker-api', '~> 1.34.0', '>= 1.34.0'
     s.add_runtime_dependency 'colorize', '~> 0.8.1'
-    s.add_runtime_dependency 'rubyzip', '~> 1.0.0', '>= 1.0.0'
+    s.add_runtime_dependency 'rubyzip', '~> 1.2.0', '>= 1.2.0'
   end
