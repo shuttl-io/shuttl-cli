@@ -7,9 +7,11 @@ require_relative 'base'
 class Build < CommandBase
 
     def build (options)
+        Docker.options[:read_timeout] = 180
         $stdout.print "Building new image\n"        
         file = File.expand_path(options[:fileName], Dir.getwd)
         shuttlConfig = ShuttlDSL.load file, options[:stage]
+        shuttlConfig.setEnvFile options[:env]
         # tar = shuttlConfig.makeImage options[:stage], @cwd
         begin
             step = 1

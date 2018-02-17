@@ -1,6 +1,6 @@
 class Builder 
 
-    attr_accessor :stage, :buildStage, :buildSettings, :volumes
+    attr_accessor :stage, :buildStage, :buildSettings, :volumes, :entrypoint
     def initialize (fileLocation, stage=nil, name=nil)
         @name = name
         @buildStage = stage
@@ -131,6 +131,8 @@ class Builder
             @buildSettings[:settings].each do |key, value|
                 query[:buildargs][key] = value.to_s
             end
+            query[:buildargs] = query[:buildargs].merge @env || Hash[]
+            puts query[:buildargs]
             query[:buildargs] = query[:buildargs].to_json
             if clean
                 query[:nocache] = true
@@ -191,4 +193,17 @@ class Builder
         @volumes
     end
 
+    def setEnvFile(env)
+        if env.nil?
+            @env = Hash[]
+            return
+        end
+        File.open(env, 'r') do |fi|
+            @env = JSON.parse(fi.read)
+        end
+    end
+
+    def cmd (cmd)
+        add "CMD #{cmd}"
+    end
 end

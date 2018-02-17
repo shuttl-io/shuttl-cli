@@ -1,4 +1,4 @@
-# shuttl-cli
+# shuttl-cli [![Gem Version](https://badge.fury.io/rb/shuttl.svg)](https://badge.fury.io/rb/shuttl)
 The command line tool for building Shuttl files!
 
 ## Purpose

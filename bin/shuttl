@@ -11,10 +11,11 @@ require_relative '../src/commands/run'
 require_relative '../src/commands/ssh'
 require_relative '../src/commands/deploy'
 require_relative '../src/commands/install'
+require_relative '../src/settings'
 
 Docker.validate_version!
 
-VERSION = '1.2.0'
+VERSION = "#{ShuttlSettings::VERSION} build #{ShuttlSettings::BUILD}"
 
 options = {
     :fileName => './Shuttlfile'
@@ -39,6 +40,7 @@ subcommands = Hash[
         :opts => OptionParser.new do |opts|
             options[:stage] = 'dev'
             options[:clean] = false
+            options[:env] = nil
             opts.on('--file FILE', 'Defines the file to use as the build file') do |file|
                 options[:fileName] = file
             end       
@@ -47,6 +49,9 @@ subcommands = Hash[
             end
             opts.on('--clean', 'Preform a clean build (Don\'t use the cache)') do 
                 options[:clean] = true
+            end
+            opts.on('--env FILE', 'defines the build arguments to use') do |file|
+                options[:env] = file
             end
         end,
         :runner => Build.new
@@ -100,6 +105,9 @@ subcommands = Hash[
             options[:stage] = 'production'
             opts.on('-s STAGE', '--stage STAGE', 'The build stage') do |stage|
                 options[:stage] = stage
+            end
+            opts.on('-t TAG', '--registry TAG', 'The registry to push to') do |tag|
+                options[:tag] = tag
             end
         end,
         :runner => Deploy.new

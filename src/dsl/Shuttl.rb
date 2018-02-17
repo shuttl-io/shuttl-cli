@@ -93,4 +93,8 @@ class Shuttl
     def IS (name)
         proc {|value| value == name }
     end
+
+    def CMD (cmd)
+        @builder.cmd cmd
+    end
 end
