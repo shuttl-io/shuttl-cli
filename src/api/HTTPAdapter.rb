@@ -1,6 +1,7 @@
-class ShuttlNotFound < StandardError
+require 'net/http'
+require 'json'
 
-end
+require_relative "./Exceptions"
 
 class HTTPAdapter
     def initialize (url, headers=Hash[])
@@ -33,7 +34,7 @@ class HTTPAdapter
             res[headerName] = headerValue
         end
         res = @http.request(res)
-        raise ShuttlNotFound if res.is_a?(Net::HTTPNotFound)
+        raise NotFound.new(res) if res.is_a?(Net::HTTPNotFound)
         JSON.parse(res.body)
     end
 end
