@@ -3,6 +3,7 @@ require 'io/console'
 
 require_relative '../api/Api'
 require_relative '../settings'
+require_relative "../api/Exceptions"
 require_relative 'base'
 
 class Login < CommandBase
@@ -17,7 +18,7 @@ class Login < CommandBase
             resp = @api.login(userName, password)
             @info['token'] = resp["token"]
             puts "Login successful!".green
-        rescue ShuttlNotFound
+        rescue NotFound
             $stderr.puts "username or password is incorrect".red
         end
     end
