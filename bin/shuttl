@@ -11,6 +11,7 @@ require_relative '../src/commands/run'
 require_relative '../src/commands/ssh'
 require_relative '../src/commands/deploy'
 require_relative '../src/commands/install'
+require_relative '../src/commands/login'
 require_relative '../src/settings'
 
 Docker.validate_version!
@@ -120,6 +121,11 @@ subcommands = Hash[
             end
         end,
         :runner => Install.new
+    },
+    'login' => {
+        :opts => OptionParser.new do |opts|
+        end,
+        :runner => Login.new
     }
 ]
 

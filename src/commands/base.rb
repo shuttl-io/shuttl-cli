@@ -7,6 +7,11 @@ class CommandBase
             @info = JSON.parse(fi.read)
         end
         @cwd = Dir.getwd
+        auth = {}
+        if @info.key?('token')
+            auth = {'Authentication': "Token #{@info['token']}"}
+        end
+        @api = ShuttlAPI.new ShuttlSettings::APIURL, auth
     end
 
     def handle (options, args)
